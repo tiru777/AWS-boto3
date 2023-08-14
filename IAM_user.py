@@ -20,12 +20,12 @@ def list_users():
         return response
 
 
-def update_user_name():
+def update_user_name(old_user_name,new_usr_name):
     # Create IAM client
     # Update a user name
     data = iam.update_user(
-        UserName='gurudeva',
-        NewUserName='thirumala'
+        UserName=old_user_name,
+        NewUserName=new_usr_name
     )
     return data
     # to check after update call list user
@@ -59,12 +59,12 @@ def delete_user(user_name):
 
 # Policies
 
-def get_policy():
+def get_policy(arn):
     """
     get policy using policy arn
     """
     response = iam.get_policy(
-        PolicyArn='arn:aws:iam::aws:policy/service-role/AWSMigrationHubRefactorSpaces-SSMAutomationPolicy'
+        PolicyArn= arn
     )
 
     return response
@@ -236,17 +236,11 @@ def create_access(username):
 
 
 # print(create_access('manu'))
-"""# {'AccessKey': {'UserName': 'manu', 'AccessKeyId': 'AKIAZNJYIJZ5YVXUNI4B', 
-# 'Status': 'Active', 'SecretAccessKey': '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', 'CreateDate': datetime.datetime(
-# 2023, 8, 14, 10, 35, 38, tzinfo=tzutc())}, 'ResponseMetadata': {'RequestId': 
-# 'e1cc0e85-f0a1-4fab-815f-77ee0deb1b61', 'HTTPStatusCode': 200, 'HTTPHeaders': {'x-amzn-requestid': 
-# 'e1cc0e85-f0a1-4fab-815f-77ee0deb1b61', 'content-type': 'text/xml', 'content-length': '546', 'date': 'Mon, 
-# 14 Aug 2023 10:35:37 GMT'}, 'RetryAttempts': 0}}"""
 
 
-def update_access():
+def update_access(access_key):
     iam.update_access_key(
-        AccessKeyId='AKIAZNJYIJZ5VYP56JVI',
+        AccessKeyId=access_key,
         Status='Inactive',
         UserName='manu'
 
@@ -255,9 +249,9 @@ def update_access():
 
 # update_access()
 
-def delete_access():
+def delete_access(access_key):
     iam.delete_access_key(
-        AccessKeyId='AKIAZNJYIJZ5YVXUNI4B',
+        AccessKeyId=access_key,
         UserName='manu'
 
     )
@@ -266,14 +260,14 @@ def delete_access():
 # delete_access()
 
 
-def create_login_credentials_console(username):
+def create_login_credentials_console(username,password):
     """
 
     :param username: username
     :return: already created user with program or console of programmatic user and we can create console access
     """
     login_profile = iam.create_login_profile(
-        Password='Gurudeva@1111',
+        Password=password,
         PasswordResetRequired=False,  # after login reset purpose used
         UserName=username
     )
