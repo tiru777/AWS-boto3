@@ -1,9 +1,12 @@
+import json
+
 import boto3, os
 
 bucket_client = boto3.client('s3')
 bucket_res = boto3.resource('s3')
 from pprint import pprint
 
+from botocore.exceptions import ClientError
 
 def create_bucket(bucket_name):
     response = bucket_client.create_bucket(
@@ -136,6 +139,80 @@ def delete_object(bucket_name,file_name):
     return response
 
 
+def check_encryption(bucket_name):
+
+    try:
+        response = bucket_client.get_bucket_encryption(Bucket=bucket_name)
+        return response
+
+    except ClientError as e:
+        print("No encryption is available in this bucket")
+
+
+def set_encryption(bucket_name):
+
+    response = bucket_client.put_bucket_encryption(
+        Bucket=bucket_name,
+        ServerSideEncryptionConfiguration={
+            "Rules":[
+                {"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm" : "AES256"}}
+            ]
+        }
+    )
+
+    return response
+
+
+def add_policy(bucket_name):
+
+    bucket_policy = {
+        "Version": "2012-10-17",
+        "Id": "Policy1670146696267",
+        "Statement": [
+            {
+                "Sid": "Stmt1670146603372",
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": f'arn:aws:s3:::{bucket_name}/*',
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:x-amz-server-side-encryption": "AES256"
+                    }
+                }
+            },
+            {
+                "Sid": "Stmt1670146692796",
+                "Effect": "Deny",
+                "Principal": "*",
+                "Action": "s3:PutObject",
+                "Resource": f'arn:aws:s3:::{bucket_name}/*',
+                "Condition": {
+                    "Null": {
+                        "s3:x-amz-server-side-encryption": "true"
+                    }
+                }
+            }
+        ]
+    }
+
+    bucket_policy = json.dumps(bucket_policy)
+
+    response = bucket_client.put_bucket_policy(Bucket=bucket_name, Policy=bucket_policy)
+    return response
+
+
+def get_bucket_policy(bucket_name):
+    response = bucket_client.get_bucket_policy(Bucket=bucket_name)
+    return response['Policy']
+
+
+def delete_encryption(bucket_name):
+    """
+    enabled encryption of a bucket we can disable
+    """
+    response = bucket_client.delete_bucket_encryption(Bucket=bucket_name)
+    return response
 
 # data = create_bucket('thirumalareddy79779')
 # data = delete_bucket('thirumalareddy797797')
@@ -148,4 +225,17 @@ def delete_object(bucket_name,file_name):
 # data = get_object_filtered_file('thirumalareddy79779','file.txt')
 # data = copy_object_from_bucket_bucket('thirumalareddy797','thirumalareddy79779','file.txt')
 # data = delete_object('thirumalareddy797','file.txt')
-# pprint(data)
+data = set_encryption('thirumalareddy797')
+
+
+# data = check_encryption('thirumalareddy797')
+pprint(data)
+
+
+
+
+
+
+
+
+
