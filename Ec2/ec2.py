@@ -4,6 +4,7 @@ from pprint import pprint
 ec2_client = boto3.client('ec2')
 ec2_resource = boto3.resource('ec2')
 
+
 def describe():
     response = ec2_client.describe_instances()
 
@@ -11,7 +12,6 @@ def describe():
 
 
 def create_key_pair():
-
     resp = ec2_client.create_key_pair(
         KeyName='tiru',
         KeyType='rsa'
@@ -44,7 +44,6 @@ def create_instance():
 
 
 def list_instances():
-
     reservations = ec2_client.describe_instances().get('Reservations')
     """if we know instance id we can use direct
     # reservations = ec2_client.describe_instances().(InstanceIds=[instance_id]).get('Reservations')"""
@@ -80,7 +79,7 @@ def create_security_group():
 
 
 def security_group_describe():
-    return ec2_client.describe_security_groups() # all security groups description
+    return ec2_client.describe_security_groups()  # all security groups description
 
 
 def security_group_delete(sg_id):
@@ -107,6 +106,34 @@ def security_group_ingress(sg_id):
                 'IpRanges': [{'CidrIp': '0.0.0.0/0', 'Description': 'My description'}]
             }
         ]
+    )
+
+    return response
+
+
+user_data_script = """
+#!/bin/bash
+yum update -y 
+yum install -y httpd
+chkconfig httpd on
+service httpd start
+echo "<h1>Welcome to Python & Boto3 Course</h1>" > /var/www/html/index.html
+
+"""
+
+
+def create_instance_with_user_data():
+
+    response = ec2_resource.create_instances(
+        ImageId='ami-0b0dcb5067f052a63',
+        MinCount=1,
+        MaxCount=1,
+        InstanceType='t2.micro',
+        KeyName='mykey',
+        SecurityGroups=[
+            'launch-wizard-1'
+        ],
+        UserData=user_data_script
     )
 
     return response
