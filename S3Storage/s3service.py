@@ -8,6 +8,7 @@ from pprint import pprint
 
 from botocore.exceptions import ClientError
 
+
 def create_bucket(bucket_name):
     response = bucket_client.create_bucket(
         ACL='private',
@@ -42,7 +43,12 @@ def list_bucket():
         for bucket in response:
             print(bucket)
     """
-    return bucket_client.list_buckets()
+    bucket_names = []
+    data = bucket_client.list_buckets()
+    for k in data['Buckets']:
+        bucket_names.append(k['Name'])
+
+    return bucket_names
 
 
 def put_object(bucket_name, file_name):
@@ -95,7 +101,7 @@ def list_objects(bucket_name):
     return response
 
 
-def get_object_filtered_file(bucket_name,file_name):
+def get_object_filtered_file(bucket_name, file_name):
     response = bucket_client.get_object(
         Bucket=bucket_name,
         Key=file_name)
@@ -109,18 +115,18 @@ def get_object_filtered_file(bucket_name,file_name):
     return response
 
 
-def copy_object_from_bucket_bucket(destination_bucket,source_bucket,file_name):
+def copy_object_from_bucket_bucket(destination_bucket, source_bucket, file_name):
     response = bucket_client.copy_object(
         Bucket=destination_bucket,
-        CopySource='/'+source_bucket+'/'+file_name,
+        CopySource='/' + source_bucket + '/' + file_name,
         Key=file_name,
     )
 
     return response
 
 
-def delete_object(bucket_name,file_name):
-    response = bucket_client.delete_object(Bucket=bucket_name,Key=file_name)
+def delete_object(bucket_name, file_name):
+    response = bucket_client.delete_object(Bucket=bucket_name, Key=file_name)
     """
     # delete multiple objects
     response = bucket_client.delete_objects(
@@ -140,7 +146,6 @@ def delete_object(bucket_name,file_name):
 
 
 def check_encryption(bucket_name):
-
     try:
         response = bucket_client.get_bucket_encryption(Bucket=bucket_name)
         return response
@@ -150,12 +155,11 @@ def check_encryption(bucket_name):
 
 
 def set_encryption(bucket_name):
-
     response = bucket_client.put_bucket_encryption(
         Bucket=bucket_name,
         ServerSideEncryptionConfiguration={
-            "Rules":[
-                {"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm" : "AES256"}}
+            "Rules": [
+                {"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}
             ]
         }
     )
@@ -164,7 +168,6 @@ def set_encryption(bucket_name):
 
 
 def add_policy(bucket_name):
-
     bucket_policy = {
         "Version": "2012-10-17",
         "Id": "Policy1670146696267",
@@ -214,9 +217,10 @@ def delete_encryption(bucket_name):
     response = bucket_client.delete_bucket_encryption(Bucket=bucket_name)
     return response
 
+
 # data = create_bucket('thirumalareddy79779')
 # data = delete_bucket('thirumalareddy797797')
-# data = list_bucket()
+data = list_bucket()
 # data = put_object('thirumalareddy79779','Screenshot (16).png')
 # empty_bucket_objects('thirumalareddy797797')
 # data = upload_file('thirumalareddy79779','file.txt')
@@ -225,17 +229,8 @@ def delete_encryption(bucket_name):
 # data = get_object_filtered_file('thirumalareddy79779','file.txt')
 # data = copy_object_from_bucket_bucket('thirumalareddy797','thirumalareddy79779','file.txt')
 # data = delete_object('thirumalareddy797','file.txt')
-data = set_encryption('thirumalareddy797')
+# data = set_encryption('thirumalareddy797')
 
 
 # data = check_encryption('thirumalareddy797')
 pprint(data)
-
-
-
-
-
-
-
-
-
