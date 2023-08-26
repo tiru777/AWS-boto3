@@ -51,6 +51,13 @@ def get_email_template():
     return response
 
 
+def delete_email_template():
+    response = ses_client.delete_template(
+        TemplateName='GurudevaTemplate'
+    )
+    return response
+
+
 def send_email():
     resp = ses_client.send_templated_email(
         Source='thirumalareddy797@gmail.com',
@@ -158,7 +165,8 @@ def send_attachment_simple_email():
 # print(list_identify())
 # print(email_create_template())
 # print(get_email_template())
+# print(delete_email_template())
 # print(send_email())
 # print(send_plain_text_or_html_without_template(destination_address, plain_txt_message, source))
 # print(send_html_code_without_template())
-print(send_attachment_simple_email())
+# print(send_attachment_simple_email())
